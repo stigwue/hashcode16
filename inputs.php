@@ -8,6 +8,18 @@ class InputFile
         return $parts;
     }
 
+    private static function getTotalWeight($product_types, $product_weight)
+    {
+        $total_weight = 0;
+
+        foreach ($product_types as $product_type)
+        {
+            $total_weight += $product_weight[intval($product_type)];
+        }
+
+        return $total_weight;
+    }
+
     public static function Initialise()
     {
         $input = array();
@@ -104,6 +116,9 @@ class InputFile
         for ($i = 0; $i < $input['orders']; $i++)
         {
             $order_coord_parts = Self::splitstring(fgets($file));
+            $item_count = fgets($file);
+            $product_types = Self::splitstring(fgets($file));
+
             $input['order_details'][] = 
                 array (
                     'delivery_coord' => array(
@@ -112,8 +127,9 @@ class InputFile
                             'col'=>$order_coord_parts[1]
                         )
                     ),
-                    'item_count' => fgets($file),
-                    'product_types' => Self::splitstring(fgets($file))
+                    'item_count' => $item_count,
+                    'product_types' => $product_types,
+                    'order_weight' => Self::getTotalWeight($product_types, $input['product_weights'])
                 );
         }
         
@@ -127,10 +143,34 @@ class InputFile
 
 $structure = InputFile::fromFile('./cases/mother_of_all_warehouses.in');
 
-var_dump(json_encode($structure));
+//var_dump(json_encode($structure));
+
+$all_orders = $structure['order_details'];
+$one_trip_orders = array();
+foreach($all_orders as $single_order)
+{
+    if ($single_order['order_weight'] <= $structure['maxload'])
+    {
+        $one_trip_orders[] = $single_order;
+    }
+}
+
+echo count($one_trip_orders), '/', count($all_orders);
+
+$current_drone_id = 0;
+
+foreach($one_trip_orders as $single_order)
+{
+    //load drone
+    //echo $current_drone_id, ' L '
+    //deliver order
+}
 
 
 /*var_dump(json_encode($structure['orders']));
 var_dump(json_encode($structure['order_details']));*/
+
+//all orders less than max drone weight
+
 
 ?>
