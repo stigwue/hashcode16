@@ -2,6 +2,11 @@
 
 class InputFile
 {
+    private static function splitstring($string)
+    {
+        $parts = explode(' ', $string);
+        return $parts;
+    }
 
     public static function Initialise()
     {
@@ -30,7 +35,7 @@ class InputFile
                 ),
                 'warehouse_product_count' => array() //size = $input['products']
             )
-        }
+        );
 
         //orders
         $input['orders'] = 0;
@@ -43,11 +48,39 @@ class InputFile
                     )
                 ),
                 'item_count' => 0,
-                'product_types' = array() //size = item_count
+                'product_types' => array() //size = item_count
             )
+        );
+
+        return $input;
+    }
+
+    public static function fromFile($path)
+    {
+        $input = array();
+
+        $file = fopen($path, 'r');
+        //simulation parameters
+        $sim_pars = fgets($file);
+        $sim_pars_parts = Self::splitstring($sim_pars);
+
+        if (count($sim_pars_parts) == 5)
+        {
+            //simulation
+            $input['rows'] = $sim_pars_parts[0];
+            $input['cols'] = $sim_pars_parts[1];
+            $input['drones'] =  $sim_pars_parts[2];
+            $input['deadline'] =  $sim_pars_parts[3];
+            $input['maxload'] =  $sim_pars_parts[4];
         }
+        
+        fclose($file);
+
+        return $input;
     }
 
 }
+
+var_dump(InputFile::fromFile('./cases/mother_of_all_warehouses.in'));
 
 ?>
