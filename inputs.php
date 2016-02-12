@@ -20,6 +20,14 @@ class InputFile
         return $total_weight;
     }
 
+    /*private static function getAllWarehouses($product_id, $warehouse_details)
+    {
+        foreach($warehouse_details as $warehouse_detail)
+        {
+            if (in_array($product_id, array $haystack [, bool $strict = FALSE ] ))
+        }
+    }*/
+
     public static function Initialise()
     {
         $input = array();
@@ -141,29 +149,48 @@ class InputFile
 }
 
 
-$structure = InputFile::fromFile('./cases/mother_of_all_warehouses.in');
+$structure = InputFile::fromFile('./cases/busy_day.in');
 
 //var_dump(json_encode($structure));
 
 $all_orders = $structure['order_details'];
 $one_trip_orders = array();
+$order_id = 0;
 foreach($all_orders as $single_order)
 {
     if ($single_order['order_weight'] <= $structure['maxload'])
     {
-        $one_trip_orders[] = $single_order;
+        $one_trip_orders[] = array(
+            'order_id' => $order_id,
+            'order' => $single_order
+        );
     }
+    ++$order_id;
 }
 
-echo count($one_trip_orders), '/', count($all_orders);
+//echo count($one_trip_orders), '/', count($all_orders);
+//var_dump(json_encode($one_trip_orders));
+//var_dump(json_encode($structure['warehouse_details']));
 
 $current_drone_id = 0;
 
 foreach($one_trip_orders as $single_order)
 {
-    //load drone
-    //echo $current_drone_id, ' L '
-    //deliver order
+    //for each product item
+    foreach ($single_order['order']['product_types'] as $product_type)
+    {
+        //load drone
+        echo $current_drone_id, ' L 0 ', $product_type, ' 1<br>';
+        //deliver order
+        echo $current_drone_id, ' D ', $single_order['order_id'], ' ', $product_type, ' 1 <br>';
+
+        ++$current_drone_id;
+
+        if ($current_drone_id >= $structure['drones'])
+        {
+            $current_drone_id = 0;
+        }
+    }
 }
 
 
